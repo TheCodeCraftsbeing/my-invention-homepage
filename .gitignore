@@ -1,0 +1,8 @@
+# Build output
+_site/
+
+# Dependencies
+node_modules/
+
+# Environment variables (if you add them later)
+.env*

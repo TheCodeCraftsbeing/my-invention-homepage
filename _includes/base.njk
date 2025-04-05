@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use Pico.css for minimal, classless styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>{{ title or "My Inventions" }}</title> {# Use page title or default #}
+    <style>
+      /* Optional: Add minor custom styles here if needed */
+      body { padding-top: 1rem; }
+      h1 { margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        {# This is where content from index.md (or other pages) will be inserted #}
+        {{ content | safe }}
+    </main>
+</body>
+</html>
