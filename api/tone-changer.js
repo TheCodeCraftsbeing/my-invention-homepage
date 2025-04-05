@@ -35,8 +35,9 @@ module.exports = async (req, res) => {
     const prompt = `Rewrite the following text to have a "${tone}" tone:\n\n"${text}"`;
     console.log("Prompt for Gemini:", prompt);
 
-    // Choose the Gemini model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" }); // Or whichever model you prefer
+
+    // Use the stable versioned model name
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     // Send the prompt and get the result
     const result = await model.generateContent(prompt);
