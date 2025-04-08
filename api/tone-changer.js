@@ -88,7 +88,7 @@ module.exports = async (req, res) => {
         // --- Gemini API Interaction ---
         console.log(`Processing tone change request. Tone: "${trimmedTone}"`);
         const prompt = `Rewrite the following text to have a "${trimmedTone}" tone. Respond only with the rewritten text itself, without any preamble or explanation.\n\nOriginal Text:\n"${trimmedText}"`;
-        const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const rewrittenText = response.text();
