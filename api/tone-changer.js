@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
 
     // --- Set CORS Headers ---
     // Set headers that allow requests from your specific frontend origin
-    res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+    res.setHeader('Access-Control-Allow-Origin', '*');
     // Or use '*' for any origin (less secure, ok for initial testing maybe):
     // res.setHeader('Access-Control-Allow-Origin', '*');
 
