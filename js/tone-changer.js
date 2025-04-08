@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration ---
     // These should ideally be injected during the build process (Phase 6 from previous explanation)
     // Using window.appConfig assumes you implemented the build-time injection
-    const API_ENDPOINT_URL = window.appConfig?.toneChangerApiUrl || 'https://my-invention-homepage.vercel.app'; // Use injected URL
+    const API_ENDPOINT_URL = window.appConfig?.toneChangerApiUrl || 'https://my-invention-homepage.vercel.app/api/tone-changer'; // Use injected URL
     const API_SECRET = window.appConfig?.toneChangerApiSecret || 'YOUR_FALLBACK_SECRET_IF_NEEDED'; // Use injected Secret
 
      // Basic check if config loaded properly (add error handling if needed)
