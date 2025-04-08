@@ -3,6 +3,7 @@ module.exports = function(eleventyConfig) {
   // This allows us to use variables and logic within markdown if needed later
   eleventyConfig.setTemplateFormats(["md", "njk"]); // Process md and njk files
   eleventyConfig.markdownTemplateEngine = "njk";
+  eleventyConfig.addPassthroughCopy("js");
 
 // *** ADD THIS: Create a collection for all markdown files in the features folder ***
   eleventyConfig.addCollection("features", function(collectionApi) {

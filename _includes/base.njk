@@ -17,5 +17,10 @@
         {# This is where content from index.md (or other pages) will be inserted #}
         {{ content | safe }}
     </main>
+{% if scripts %}
+      {% for scriptUrl in scripts %}
+        <script src="{{ scriptUrl | url }}"></script>
+      {% endfor %}
+    {% endif %}
 </body>
 </html>

@@ -2,7 +2,9 @@
 layout: base.njk
 title: AI-Powered Tone Changer
 tags: feature
-status: Planned
+status: Interactive Demo Available
+scripts:
+  - /js/tone-changer.js
 ---
 
 ## AI-Powered Tone Changer
@@ -30,4 +32,42 @@ status: Planned
 *   **Backend:** Serverless Function (e.g., Vercel/Netlify Function using Node.js) to handle the Gemini API call securely.
 *   **AI:** Google Gemini API.
 
-**Status:** Idea / Planned. The interactive demo is not yet built.
+status: Interactive Demo Available
+
+<form id="tone-changer-form">
+    <label for="original-text">Enter Text:</label>
+    <textarea id="original-text" name="original-text" rows="5" required></textarea>
+
+    <label>Select Target Tone:</label>
+    <fieldset>
+       <label for="tone-formal">
+         <input type="radio" id="tone-formal" name="tone" value="Formal" required> Formal
+       </label>
+       <label for="tone-professional">
+         <input type="radio" id="tone-professional" name="tone" value="Professional"> Professional
+       </label>
+       <label for="tone-client">
+         <input type="radio" id="tone-client" name="tone" value="Client-Facing"> Client-Facing
+       </label>
+       <label for="tone-friendly">
+         <input type="radio" id="tone-friendly" name="tone" value="Friendly"> Friendly
+       </label>
+       <label for="tone-other">
+         <input type="radio" id="tone-other" name="tone" value="Other"> Other (Specify Below)
+       </label>
+    </fieldset>
+
+    <div id="other-tone-input-container" style="display: none; margin-top: 0.5rem;">
+      <label for="other-tone-input">Custom Tone:</label>
+      <input type="text" id="other-tone-input" name="other-tone-input" placeholder="e.g., Humorous, Empathetic">
+    </div>
+
+    <button type="submit" id="submit-button">Change Tone</button>
+</form>
+
+<div id="result-container" style="margin-top: 1.5rem;">
+    <h4>Result:</h4>
+    <pre><code id="result-text">The rewritten text will appear here...</code></pre>
+</div>
+
+<div id="error-container" style="margin-top: 1rem; color: red;"></div>
