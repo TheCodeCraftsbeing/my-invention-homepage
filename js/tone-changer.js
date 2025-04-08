@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Configuration ---
     // Replace with your actual deployed Vercel function URL
-    const API_ENDPOINT_URL = 'https://<your-vercel-app-url>/api/tone-changer';
+    const API_ENDPOINT_URL = 'https://my-invention-homepage.vercel.app/api/tone-changer';
     // We will inject this secret via build process later (Part 3)
     // For now, you can hardcode the *test* secret you'll set up in Vercel
     const API_SECRET = 'YOUR_TEMPORARY_TEST_SECRET'; // !! IMPORTANT: Replace or inject later !!
