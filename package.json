@@ -1,18 +1,24 @@
 {
   "name": "my-invention-homepage",
   "version": "1.0.0",
+  "description": "Homepage for inventions and features",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx @11ty/eleventy --serve",
+    "build": "npx @11ty/eleventy"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "eleventy",
+    "static",
+    "portfolio"
+  ],
+  "author": "arunprakash",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
-    "@11ty/eleventy": "^3.0.0"
+    "@11ty/eleventy": "^2.0.1"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.0"
+    "@google/generative-ai": "^0.15.0",
+    "dotenv": "^16.4.5"
   }
 }

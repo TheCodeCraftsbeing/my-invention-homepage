@@ -1,8 +1,14 @@
-# Build output
-_site/
-
 # Dependencies
 node_modules/
 
-# Environment variables (if you add them later)
+# Build Output
+_site/
+
+# Environment Variables File
 .env*
+.env.*
+!.env.example
+
+# OS generated files
+.DS_Store
+Thumbs.db

@@ -1,6 +1,5 @@
-// js/tone-changer.js
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Get references to DOM elements
     const form = document.getElementById('tone-changer-form');
     const originalTextInput = document.getElementById('original-text');
     const otherToneRadio = document.getElementById('tone-other');
@@ -11,110 +10,137 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submit-button');
 
     // --- Configuration ---
-    // These should ideally be injected during the build process (Phase 6 from previous explanation)
-    // Using window.appConfig assumes you implemented the build-time injection
-    const API_ENDPOINT_URL = window.appConfig?.toneChangerApiUrl || 'https://my-invention-homepage.vercel.app/api/tone-changer'; // Use injected URL
-    const API_SECRET = window.appConfig?.toneChangerApiSecret || 'YOUR_FALLBACK_SECRET_IF_NEEDED'; // Use injected Secret
+    // Read values injected during the build process via window.appConfig
+    const API_ENDPOINT_URL = window.appConfig?.toneChangerApiUrl;
+    const API_SECRET = window.appConfig?.toneChangerApiSecret;
+    // --- End Configuration ---
 
-     // Basic check if config loaded properly (add error handling if needed)
-    if (!API_ENDPOINT_URL || !API_SECRET || API_ENDPOINT_URL.includes('FALLBACK') || API_SECRET.includes('FALLBACK') ) {
-        console.error("CRITICAL: API URL or Secret not configured properly in window.appConfig. Check Eleventy build injection.");
-        errorContainer.textContent = "Frontend configuration error. API details missing.";
-        // Optionally disable the form entirely
-        if(form) form.style.display = 'none';
+    // --- Initial Check ---
+    // Check if the necessary elements and config exist before proceeding
+    if (!form || !originalTextInput || !resultTextElement || !errorContainer || !submitButton) {
+        console.error("CRITICAL: One or more required form elements not found on the page.");
+        if (errorContainer) errorContainer.textContent = "Page structure error: Required elements missing.";
+        return; // Stop if page structure is broken
+    }
+
+    if (!API_ENDPOINT_URL || !API_SECRET) {
+        console.error("CRITICAL: API URL or Secret not found in window.appConfig. Check Vercel env vars and Eleventy build injection.");
+        errorContainer.textContent = "Frontend configuration error: API details missing. Cannot contact server.";
+        submitButton.disabled = true; // Disable form submission if config fails
+        form.style.opacity = '0.5'; // Visually indicate form is disabled
         return; // Stop execution if config is missing
     }
-    // --- End Configuration ---
+    // --- End Initial Check ---
 
 
     // Show/hide the 'Other' tone input field based on radio selection
-    if (form) { // Check if form exists before adding listeners
-        form.addEventListener('change', (event) => {
-            if (event.target.name === 'tone') {
-                if (otherToneRadio.checked) {
-                    otherToneInputContainer.style.display = 'block';
-                    otherToneInput.required = true;
-                } else {
-                    otherToneInputContainer.style.display = 'none';
-                    otherToneInput.required = false;
-                    otherToneInput.value = ''; // Clear if hidden
-                }
+    form.addEventListener('change', (event) => {
+        if (event.target.name === 'tone') {
+            if (otherToneRadio.checked) {
+                otherToneInputContainer.style.display = 'block';
+                otherToneInput.required = true;
+            } else {
+                otherToneInputContainer.style.display = 'none';
+                otherToneInput.required = false;
+                otherToneInput.value = ''; // Clear if hidden
             }
-        });
+        }
+    });
 
-        // Handle form submission
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Prevent default browser form submission
+    // Handle form submission
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Prevent default browser form submission
 
-            // Clear previous results/errors
-            resultTextElement.textContent = 'Processing...';
-            errorContainer.textContent = '';
-            submitButton.disabled = true;
-            submitButton.textContent = 'Working...';
+        // --- UI Reset and Loading State ---
+        resultTextElement.textContent = 'Processing...'; // Show loading message
+        resultTextElement.parentElement.style.opacity = '0.6'; // Dim result area slightly
+        errorContainer.textContent = ''; // Clear previous errors
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-busy', 'true'); // Use Pico loading indicator
+        submitButton.textContent = 'Working...';
+        // --- End UI Reset ---
 
-            let selectedTone = form.elements['tone'].value;
-            if (selectedTone === 'Other') {
-                selectedTone = otherToneInput.value.trim();
-                if (!selectedTone) {
-                  errorContainer.textContent = 'Please specify the custom tone.';
-                  resultTextElement.textContent = 'Rewrite will appear here...';
-                  submitButton.disabled = false;
-                  submitButton.textContent = 'Change Tone';
-                  return; // Stop if custom tone is selected but empty
+        // --- Get Form Data ---
+        let selectedTone = form.elements['tone'].value;
+        if (selectedTone === 'Other') {
+            selectedTone = otherToneInput.value.trim();
+            if (!selectedTone) {
+              errorContainer.textContent = 'Please specify the custom tone when "Other" is selected.';
+              resultTextElement.textContent = 'Rewrite will appear here...'; // Reset result text
+              resultTextElement.parentElement.style.opacity = '1';
+              submitButton.disabled = false;
+              submitButton.removeAttribute('aria-busy');
+              submitButton.textContent = 'Change Tone';
+              return; // Stop if custom tone is selected but empty
+            }
+        }
+        const originalText = originalTextInput.value.trim(); // Trim input text
+        if (!originalText) {
+             errorContainer.textContent = 'Please enter some text to change.';
+             resultTextElement.textContent = 'Rewrite will appear here...';
+             resultTextElement.parentElement.style.opacity = '1';
+             submitButton.disabled = false;
+             submitButton.removeAttribute('aria-busy');
+             submitButton.textContent = 'Change Tone';
+             return; // Stop if no text entered
+        }
+        // --- End Get Form Data ---
+
+
+        // --- API Call ---
+        try {
+            const response = await fetch(API_ENDPOINT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Send the secret key obtained from build injection
+                    'X-API-Secret': API_SECRET
+                },
+                body: JSON.stringify({
+                    text: originalText,
+                    tone: selectedTone
+                })
+            });
+
+            // Check if response status indicates an error
+            if (!response.ok) {
+                let errorData = { message: `API Error: ${response.status} ${response.statusText}` }; // Default error
+                try {
+                    // Try to parse more specific error from API response body
+                    const apiError = await response.json();
+                    errorData.message = apiError?.details || apiError?.error || errorData.message;
+                } catch (e) {
+                    // Ignore if response body is not JSON or parsing fails
+                    console.warn("Could not parse error response body as JSON.");
                 }
+                throw new Error(errorData.message); // Throw an error to be caught below
             }
 
-            const originalText = originalTextInput.value;
+            // Parse successful response
+            const data = await response.json();
 
-            // THIS is where the frontend logic STOPS before the fetch call
-            // The backend code previously pasted here was incorrect
-
-            try {
-                const response = await fetch(API_ENDPOINT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Send the secret key in a custom header
-                        'X-API-Secret': API_SECRET // Use the variable defined above
-                    },
-                    body: JSON.stringify({
-                        text: originalText,
-                        tone: selectedTone
-                    })
-                });
-
-                if (!response.ok) {
-                    // Try to get error details from response body
-                    let errorData;
-                    try {
-                        errorData = await response.json();
-                    } catch (e) {
-                        // Ignore if body is not json or response is empty
-                         console.warn("Could not parse error response as JSON:", e);
-                    }
-                    const errorMessage = errorData?.details || errorData?.error || `Error: ${response.status} ${response.statusText}`;
-                    throw new Error(errorMessage);
-                }
-
-                const data = await response.json();
-
-                if (data.rewrittenText) {
-                    resultTextElement.textContent = data.rewrittenText;
-                } else {
-                     resultTextElement.textContent = 'No rewrite returned by the API.';
-                }
-
-            } catch (error) {
-                console.error('Error calling API:', error);
-                errorContainer.textContent = `An error occurred: ${error.message}`;
-                resultTextElement.textContent = 'Rewrite failed.'; // Reset result area on error
-            } finally {
-                 // Re-enable button regardless of success or failure
-                 submitButton.disabled = false;
-                 submitButton.textContent = 'Change Tone';
+            // Display result
+            if (data.rewrittenText) {
+                resultTextElement.textContent = data.rewrittenText;
+            } else {
+                 console.warn("API returned success status but no rewrittenText found in response:", data);
+                 resultTextElement.textContent = 'API returned an unexpected response.';
+                 errorContainer.textContent = 'Received incomplete data from server.';
             }
-        }); // End of form submit listener
-    } else {
-         console.warn("Tone changer form not found on this page.");
-    }
+
+        } catch (error) {
+            // Handle fetch errors (network issues) or errors thrown from response check
+            console.error('Error during API call or processing:', error);
+            errorContainer.textContent = `An error occurred: ${error.message}`;
+            resultTextElement.textContent = 'Rewrite failed.'; // Reset result area on error
+        } finally {
+             // --- UI Reset After Completion ---
+             resultTextElement.parentElement.style.opacity = '1'; // Restore opacity
+             submitButton.disabled = false;
+             submitButton.removeAttribute('aria-busy');
+             submitButton.textContent = 'Change Tone';
+             // --- End UI Reset ---
+        }
+        // --- End API Call ---
+    }); // End of form submit listener
 }); // End of DOMContentLoaded listener

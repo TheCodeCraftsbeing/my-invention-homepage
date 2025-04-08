@@ -11,10 +11,10 @@ This is the starting point for documenting and showcasing my project ideas, feat
 
 {% if collections.features.length > 0 %}
 <ul>
-  {%- for feature in collections.features %}
+  {%- for feature in collections.features | reverse %} {# Optional: reverse to show newest first #}
   <li>
     <a href="{{ feature.url | url }}">{{ feature.data.title }}</a>
-    {% if feature.data.status %}- *({{ feature.data.status }})*{% endif %}
+    {% if feature.data.status %}- <small><em>({{ feature.data.status }})</em></small>{% endif %}
   </li>
   {%- endfor %}
 </ul>

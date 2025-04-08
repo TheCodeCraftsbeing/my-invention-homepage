@@ -7,47 +7,25 @@
     <!-- Link to Pico.css for minimal, classless styling from a CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
 
-    <!--
-      Sets the browser tab title.
-      It uses the 'title' variable from the specific page's front matter.
-      If no 'title' is set on the page, it defaults to "My Inventions".
-    -->
+    <!-- Set page title from front matter or default -->
     <title>{{ title or "My Inventions" }}</title>
 
-    <!-- Optional: Add minor custom styles here if needed -->
+    <!-- Custom mini styles -->
     <style>
-      body {
-          padding-bottom: 3rem; /* Add some space at the bottom */
-      }
-      main.container {
-          padding-top: 1.5rem; /* Add some space above the main content */
-      }
-      h1, h2, h3 {
-          margin-bottom: 1.5rem;
-      }
-      /* Style for code blocks inside pre tags */
-      pre > code {
-        display: block;
-        padding: 1rem;
-        background-color: #f5f5f5; /* Light grey background */
-        border-radius: 4px;
-        overflow-x: auto; /* Allow horizontal scrolling for long lines */
-        white-space: pre-wrap; /* Wrap long lines */
-        word-wrap: break-word; /* Break long words */
-        font-size: 0.9em;
-        line-height: 1.4;
-      }
-      /* Simple styling for navigation */
-      nav {
-        margin-bottom: 2rem;
-        border-bottom: 1px solid #e1e1e1;
-        padding-bottom: 1rem;
-      }
+      body { padding-bottom: 3rem; }
+      main.container { padding-top: 1.5rem; }
+      h1, h2, h3 { margin-bottom: 1.5rem; }
+      pre > code { display: block; padding: 1rem; background-color: #f5f5f5; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; line-height: 1.4; }
+      nav { margin-bottom: 2rem; border-bottom: 1px solid #e1e1e1; padding-bottom: 1rem; }
+      /* Style for error messages */
+      .error-message { color: #d83a3a; /* Pico error color */ margin-top: 0.5rem; font-weight: bold; }
+      /* Style for result container */
+      #result-container h4 { margin-bottom: 0.5rem; }
     </style>
 </head>
 <body>
 
-    <!-- Main container for content, styled by Pico.css -->
+    <!-- Main container -->
     <main class="container">
 
         <!-- Simple Navigation Bar -->
@@ -57,59 +35,27 @@
           </ul>
           <ul>
             <li><a href="{{ '/' | url }}">Home</a></li>
-            <!-- Add other global navigation links here if needed later -->
-            <!-- Example: <li><a href="/about/">About</a></li> -->
           </ul>
         </nav>
 
-        <!--
-          This is the main content injection point.
-          Eleventy renders the content from your Markdown files (like index.md or features/tone-changer.md)
-          and inserts the resulting HTML here.
-          The '| safe' filter is crucial to ensure that HTML within your content is rendered correctly
-          and not escaped (treated as plain text).
-        -->
+        <!-- Page content injected here -->
         {{ content | safe }}
 
     </main> <!-- End of main container -->
 
-    <!-- ============================================================== -->
-    <!-- JavaScript Injection and Loading Section                      -->
-    <!-- Placed near the end of the body for better page load performance -->
-    <!-- ============================================================== -->
 
-    <!--
-      STEP 1: Inject Environment Variables for Frontend Use
-      This script block is generated during the Eleventy build process.
-      It safely injects specific environment variables (defined in Vercel or .env)
-      into a global JavaScript object `window.appConfig`.
-      This avoids hardcoding secrets directly in the committed frontend JS files.
-      The corresponding variables (e.g., TONE_CHANGER_API_URL) must be made
-      available to Nunjucks via `eleventyConfig.addGlobalData("env", process.env)`
-      in your .eleventy.js configuration file.
-    -->
+    <!-- JavaScript Injection and Loading -->
+
+    <!-- Inject environment variables needed by frontend -->
     <script>
       window.appConfig = {
-        // Get the API URL from the build environment
         toneChangerApiUrl: "{{ env.TONE_CHANGER_API_URL }}",
-        // Get the API Secret from the build environment
-        toneChangerApiSecret: "{{ env.API_SECRET_KEY }}"
+        toneChangerApiSecret: "{{ env.TONE_CHANGER_API_SECRET }}"
       };
-
-      // Optional: Log the injected config to the browser console for debugging purposes.
-      // Remove or comment this out for production deployment.
-     console.log('Injected App Config:', window.appConfig);
+      // console.log('Injected App Config:', window.appConfig); // Optional debug log
     </script>
 
-    <!--
-      STEP 2: Conditionally Load Page-Specific Scripts
-      This Nunjucks block checks if the current page's front matter defines a 'scripts' array.
-      If it does, it loops through each URL in the array and adds a <script> tag
-      to load that specific JavaScript file.
-      This ensures that scripts like 'tone-changer.js' are only loaded on the pages
-      that actually need them, improving performance for other pages.
-      The '| url' filter ensures Eleventy generates the correct relative path to the script.
-    -->
+    <!-- Conditionally load page-specific scripts -->
     {% if scripts %}
       {% for scriptUrl in scripts %}
         <script src="{{ scriptUrl | url }}"></script>
