@@ -1,11 +1,13 @@
 ---
 layout: base.njk
-title: AI-Powered Tone Changer
+title: AI-Powered Tone Changer: Rewrite Your Text
 tags: feature
 status: Interactive Demo
 scripts:
   - /js/tone-changer.js
 ---
+
+This tool leverages the power of Artificial Intelligence, specifically Google Gemini, to rewrite your text in a variety of tones. Whether you need to sound more formal for a business proposal, friendly for a casual message, or even adopt a custom tone, this AI-powered assistant can help you effectively communicate your message with the right nuance.
 
 ## AI-Powered Tone Changer
 
@@ -39,14 +41,14 @@ scripts:
            <input type="radio" id="tone-friendly" name="tone" value="Friendly"> Friendly
          </label>
          <label for="tone-other">
-           <input type="radio" id="tone-other" name="tone" value="Other"> Other (Specify Below)
+           <input type="radio" id="tone-other" name="tone" value="Other"> Other (Type your custom tone in the text field below)
          </label>
       </fieldset>
 
       <div id="other-tone-input-container" style="display: none; margin-top: 0.5rem;">
         <label for="other-tone-input">
           Custom Tone:
-          <input type="text" id="other-tone-input" name="other-tone-input" placeholder="e.g., Humorous, Empathetic">
+          <input type="text" id="other-tone-input" name="other-tone-input" placeholder="e.g., Humorous, Empathetic, Sarcastic">
         </label>
       </div>
 
